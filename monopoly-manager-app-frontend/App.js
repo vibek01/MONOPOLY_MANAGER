@@ -4,15 +4,17 @@ import { NavigationContainer } from "@react-navigation/native";
 import AppNavigator from "./navigation/AppNavigator";
 import { StatusBar } from "react-native";
 import { COLORS } from "./constants/theme";
+import { GameProvider } from "./contexts/GameContext"; // Import the provider
 
 export default function App() {
-  // We no longer need to load fonts, so the app can render immediately.
   return (
-    <>
+    <GameProvider>
+      {" "}
+      {/* Wrap the entire app */}
       <StatusBar barStyle="light-content" backgroundColor={COLORS.background} />
       <NavigationContainer>
         <AppNavigator />
       </NavigationContainer>
-    </>
+    </GameProvider>
   );
 }

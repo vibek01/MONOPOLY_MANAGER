@@ -2,10 +2,8 @@
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
-// Import Screens
 import HomeScreen from "../screens/main/HomeScreen";
-// Import DashboardScreen later when we create it
-// import DashboardScreen from '../screens/game/DashboardScreen';
+import DashboardScreen from "../screens/game/DashboardScreen"; // Import the new screen
 
 const Stack = createNativeStackNavigator();
 
@@ -13,12 +11,13 @@ const AppNavigator = () => {
   return (
     <Stack.Navigator
       screenOptions={{
-        headerShown: false, // Hide the default header
+        headerShown: false,
       }}
       initialRouteName="Home"
     >
       <Stack.Screen name="Home" component={HomeScreen} />
-      {/* <Stack.Screen name="Dashboard" component={DashboardScreen} /> */}
+      <Stack.Screen name="Dashboard" component={DashboardScreen} />{" "}
+      {/* Add the route */}
     </Stack.Navigator>
   );
 };
