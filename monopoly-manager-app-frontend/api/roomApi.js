@@ -1,7 +1,7 @@
 // api/roomApi.js
 
-// Replace with your computer's local IP address
-const BASE_URL = "http://YOUR_COMPUTER_IP:4000/api";
+// Your computer's local IP address has been integrated here.
+const BASE_URL = "http://192.168.43.8:4000/api";
 
 /**
  * A professional, reusable fetch wrapper.
@@ -21,14 +21,21 @@ const apiFetch = async (endpoint, options = {}) => {
 
     if (!response.ok) {
       // If server returns an error (4xx or 5xx), throw an error with the message from the backend
+      // Handle network errors that don't return JSON
+      if (response.status === 404)
+        throw new Error("Server endpoint not found.");
       throw new Error(data.message || "An unknown error occurred.");
     }
 
     return data;
   } catch (error) {
-    // Re-throw the error to be caught by the calling function
+    // This will catch both network errors (e.g., server is off) and application errors
     console.error(`API call failed: ${error.message}`);
-    throw error;
+    // Provide a more user-friendly message for common network issues
+    if (error.message.includes("Network request failed")) {
+      throw new Error("Could not connect to the server. Is it running?");
+    }
+    throw error; // Re-throw the original error for specific handling
   }
 };
 

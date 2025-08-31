@@ -4,29 +4,26 @@ import {
   View,
   Text,
   StyleSheet,
+  TextInput, // <-- We are using the standard, built-in TextInput
+  Alert,
+  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  Alert,
-  ActivityIndicator,
 } from "react-native";
 
 import Container from "../../components/layout/Container";
-import { COLORS, FONTS, SIZES } from "../../constants/theme";
-import { Zap, LogIn } from "lucide-react-native";
 import CustomButton from "../../components/common/Button";
-import CustomTextInput from "../../components/common/TextInput";
-
-// Import our new services and context
+import { COLORS, FONTS, SIZES } from "../../constants/theme";
 import { createRoom, joinRoom } from "../../api/roomApi";
-// import { useGame } from "../../contexts/GameContext";
-import { useGame } from '../../contexts/GameContext'
+import { useGame } from "../../contexts/GameContext";
+import { Zap, LogIn } from "lucide-react-native";
 
 const HomeScreen = ({ navigation }) => {
   const [playerName, setPlayerName] = useState("");
   const [roomId, setRoomId] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const { initializeGame } = useGame(); // Get the function from our context
+  const { initializeGame } = useGame();
 
   const handleCreateRoom = async () => {
     if (!playerName.trim()) {
@@ -37,7 +34,7 @@ const HomeScreen = ({ navigation }) => {
     try {
       const { player, roomId: newRoomId } = await createRoom(playerName);
       initializeGame(player, newRoomId);
-      navigation.replace("Dashboard"); // Use 'replace' so user can't go back to home screen
+      navigation.replace("Dashboard");
     } catch (error) {
       Alert.alert("Error Creating Room", error.message);
     } finally {
@@ -68,50 +65,15 @@ const HomeScreen = ({ navigation }) => {
     }
   };
 
-  // If loading, show a spinner instead of the buttons
-  const renderButtons = () => {
-    if (isLoading) {
-      return <ActivityIndicator size="large" color={COLORS.primary} />;
-    }
-    return (
-      <>
-        <CustomButton
-          title="Create New Room"
-          onPress={handleCreateRoom}
-          icon={<Zap color={COLORS.background} size={20} />}
-          disabled={!playerName.trim()}
-        />
-        <View style={styles.divider}>
-          <View style={styles.line} />
-          <Text style={styles.dividerText}>OR</Text>
-          <View style={styles.line} />
-        </View>
-        <CustomTextInput
-          placeholder="Enter Room Code"
-          value={roomId}
-          onChangeText={setRoomId}
-          autoCapitalize="characters"
-        />
-        <CustomButton
-          title="Join Room"
-          onPress={handleJoinRoom}
-          variant="secondary"
-          icon={<LogIn color={COLORS.white} size={20} />}
-          disabled={!playerName.trim() || !roomId.trim()}
-        />
-      </>
-    );
-  };
-
   return (
     <Container>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={{ flex: 1 }}
+      <ScrollView
+        contentContainerStyle={styles.scrollContainer}
+        keyboardShouldPersistTaps="handled"
       >
-        <ScrollView
-          contentContainerStyle={styles.scrollViewContent}
-          keyboardShouldPersistTaps="handled"
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+          style={styles.container}
         >
           <View style={styles.header}>
             <Text style={styles.title}>Monopoly</Text>
@@ -119,23 +81,69 @@ const HomeScreen = ({ navigation }) => {
           </View>
 
           <View style={styles.formContainer}>
-            <CustomTextInput
+            <TextInput
+              style={styles.input}
               placeholder="Enter Your Name"
+              placeholderTextColor={COLORS.textMuted}
               value={playerName}
               onChangeText={setPlayerName}
+              selectionColor={COLORS.primary}
             />
-            {renderButtons()}
+
+            {isLoading ? (
+              <ActivityIndicator
+                size="large"
+                color={COLORS.primary}
+                style={{ marginVertical: 20 }}
+              />
+            ) : (
+              <>
+                <CustomButton
+                  title="Create New Room"
+                  onPress={handleCreateRoom}
+                  icon={<Zap color={COLORS.background} size={20} />}
+                  disabled={!playerName.trim()}
+                />
+
+                <View style={styles.divider}>
+                  <View style={styles.line} />
+                  <Text style={styles.dividerText}>OR</Text>
+                  <View style={styles.line} />
+                </View>
+
+                <TextInput
+                  style={styles.input}
+                  placeholder="Enter Room Code"
+                  placeholderTextColor={COLORS.textMuted}
+                  value={roomId}
+                  onChangeText={setRoomId}
+                  autoCapitalize="characters"
+                  selectionColor={COLORS.primary}
+                />
+
+                <CustomButton
+                  title="Join Room"
+                  onPress={handleJoinRoom}
+                  variant="secondary"
+                  icon={<LogIn color={COLORS.white} size={20} />}
+                  disabled={!playerName.trim() || !roomId.trim()}
+                />
+              </>
+            )}
           </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
+        </KeyboardAvoidingView>
+      </ScrollView>
     </Container>
   );
 };
 
-// Add/Update styles
 const styles = StyleSheet.create({
-  scrollViewContent: {
+  scrollContainer: {
     flexGrow: 1,
+    justifyContent: "center",
+  },
+  container: {
+    flex: 1,
     justifyContent: "center",
   },
   header: {
@@ -145,17 +153,25 @@ const styles = StyleSheet.create({
   title: {
     ...FONTS.h1,
     color: COLORS.white,
-    textShadowColor: COLORS.primary,
-    textShadowRadius: 10,
   },
   subtitle: {
     ...FONTS.h3,
     color: COLORS.textMuted,
-    marginTop: -SIZES.base,
   },
   formContainer: {
     width: "100%",
-    paddingBottom: 20, // Add some padding at the bottom
+  },
+  // This is the new, simple style for the built-in TextInput
+  input: {
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
+    height: 50,
+    borderRadius: SIZES.radius,
+    paddingHorizontal: SIZES.padding,
+    color: COLORS.white,
+    ...FONTS.body,
+    marginBottom: SIZES.padding,
+    borderWidth: 1,
+    borderColor: COLORS.glassBorder,
   },
   divider: {
     flexDirection: "row",

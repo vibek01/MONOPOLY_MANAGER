@@ -4,13 +4,11 @@ import { NavigationContainer } from "@react-navigation/native";
 import AppNavigator from "./navigation/AppNavigator";
 import { StatusBar } from "react-native";
 import { COLORS } from "./constants/theme";
-import { GameProvider } from "./contexts/GameContext"; // Import the provider
+import { GameProvider } from "./contexts/GameContext";
 
 export default function App() {
   return (
     <GameProvider>
-      {" "}
-      {/* Wrap the entire app */}
       <StatusBar barStyle="light-content" backgroundColor={COLORS.background} />
       <NavigationContainer>
         <AppNavigator />
